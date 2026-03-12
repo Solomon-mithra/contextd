@@ -10,6 +10,8 @@ from core.db import (
     count_files,
     create_folder,
     create_index_job,
+    delete_file,
+    delete_folder,
     finish_index_job,
     get_file_by_id,
     get_file_by_path,
@@ -22,6 +24,7 @@ from core.db import (
     mark_missing_files_deleted,
     sync_discovered_file,
     replace_chunks_for_file,
+    reset_local_data,
     search_chunks,
     update_file_after_index,
     update_file_failure,
@@ -67,6 +70,10 @@ class ScanRequest(BaseModel):
 class IndexFileRequest(BaseModel):
     file_id: str | None = Field(None, description="Known file ID from the metadata store")
     path: str | None = Field(None, description="Absolute path to a discovered file")
+
+
+class IndexFilesRequest(BaseModel):
+    file_ids: list[str] = Field(..., min_length=1, description="Known file IDs from the metadata store")
 
 
 class SearchRequest(BaseModel):
@@ -159,6 +166,13 @@ def get_folders() -> dict[str, Any]:
     }
 
 
+@app.delete("/folders/{folder_id}")
+def remove_folder(folder_id: str) -> dict[str, Any]:
+    if not delete_folder(folder_id):
+        raise HTTPException(status_code=404, detail="Folder not found")
+    return {"deleted": True, "folder_id": folder_id}
+
+
 @app.post("/index/scan")
 def index_scan(req: ScanRequest) -> dict[str, Any]:
     folders = list_folders(active_only=True)
@@ -245,9 +259,42 @@ def index_run() -> dict[str, Any]:
     }
 
 
+@app.post("/index/files")
+def index_files(req: IndexFilesRequest) -> dict[str, Any]:
+    results: list[dict[str, Any]] = []
+    failures: list[dict[str, Any]] = []
+
+    for file_id in req.file_ids:
+        try:
+            results.append(_index_file_record(file_id))
+        except HTTPException as exc:
+            record = get_file_by_id(file_id)
+            failures.append(
+                {
+                    "file_id": file_id,
+                    "path": record.path if record else None,
+                    "detail": exc.detail,
+                }
+            )
+
+    return {
+        "processed": len(results),
+        "failed": len(failures),
+        "results": results,
+        "failures": failures,
+    }
+
+
 @app.get("/files")
 def get_files() -> dict[str, Any]:
     return {"files": list_files()}
+
+
+@app.delete("/files/{file_id}")
+def remove_file(file_id: str) -> dict[str, Any]:
+    if not delete_file(file_id):
+        raise HTTPException(status_code=404, detail="File not found")
+    return {"deleted": True, "file_id": file_id}
 
 
 @app.post("/search")
@@ -283,4 +330,13 @@ def index_status() -> dict[str, Any]:
     return {
         "files": count_files(),
         "recent_jobs": latest_jobs(limit=10),
+    }
+
+
+@app.post("/admin/reset")
+def admin_reset() -> dict[str, Any]:
+    cleared = reset_local_data()
+    return {
+        "reset": True,
+        "cleared": cleared,
     }

@@ -36,6 +36,11 @@ def _ensure_parent_dir(db_path: str) -> None:
     Path(db_path).parent.mkdir(parents=True, exist_ok=True)
 
 
+def _configure_connection(conn: sqlite3.Connection) -> None:
+    # SQLite foreign keys are disabled by default per connection.
+    conn.execute("PRAGMA foreign_keys = ON")
+
+
 def _ensure_schema(conn: sqlite3.Connection) -> None:
     table_row = conn.execute(
         "SELECT name FROM sqlite_master WHERE type='table' AND name='folders'"
@@ -56,6 +61,7 @@ def get_conn() -> Iterable[sqlite3.Connection]:
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     try:
+        _configure_connection(conn)
         _ensure_schema(conn)
         yield conn
         conn.commit()
@@ -179,6 +185,30 @@ def list_folders(active_only: bool = False) -> list[Folder]:
     return [_row_to_folder(r) for r in rows]
 
 
+def delete_folder(folder_id: str) -> bool:
+    with get_conn() as conn:
+        result = conn.execute("DELETE FROM folders WHERE id = ?", (folder_id,))
+    return result.rowcount > 0
+
+
+def reset_local_data() -> dict[str, int]:
+    with get_conn() as conn:
+        folders = conn.execute("SELECT COUNT(*) AS c FROM folders").fetchone()["c"]
+        files = conn.execute("SELECT COUNT(*) AS c FROM files").fetchone()["c"]
+        chunks = conn.execute("SELECT COUNT(*) AS c FROM chunks").fetchone()["c"]
+        jobs = conn.execute("SELECT COUNT(*) AS c FROM index_jobs").fetchone()["c"]
+
+        conn.execute("DELETE FROM folders")
+        conn.execute("DELETE FROM index_jobs")
+
+    return {
+        "folders": int(folders),
+        "files": int(files),
+        "chunks": int(chunks),
+        "index_jobs": int(jobs),
+    }
+
+
 def get_file_by_id(file_id: str) -> Optional[FileRecord]:
     with get_conn() as conn:
         row = conn.execute("SELECT * FROM files WHERE id = ?", (file_id,)).fetchone()
@@ -189,6 +219,21 @@ def get_file_by_path(path: str) -> Optional[FileRecord]:
     with get_conn() as conn:
         row = conn.execute("SELECT * FROM files WHERE path = ?", (path,)).fetchone()
     return _row_to_file(row) if row else None
+
+
+def delete_file(file_id: str) -> bool:
+    with get_conn() as conn:
+        ts = now_iso()
+        conn.execute("DELETE FROM chunks WHERE file_id = ?", (file_id,))
+        result = conn.execute(
+            """
+            UPDATE files
+            SET status = 'deleted', updated_at = ?, last_error = NULL
+            WHERE id = ? AND status != 'deleted'
+            """,
+            (ts, file_id),
+        )
+    return result.rowcount > 0
 
 
 def list_files() -> list[dict[str, object]]:
@@ -212,6 +257,7 @@ def list_files() -> list[dict[str, object]]:
                 MIN(c.embedding_model) AS embedding_model
             FROM files f
             LEFT JOIN chunks c ON c.file_id = f.id
+            WHERE f.status != 'deleted'
             GROUP BY f.id
             ORDER BY f.created_at ASC
             """
@@ -395,7 +441,9 @@ def mark_missing_files_deleted(folder_id: str, seen_paths: set[str]) -> int:
 
 def count_files() -> dict[str, int]:
     with get_conn() as conn:
-        total = conn.execute("SELECT COUNT(*) AS c FROM files").fetchone()["c"]
+        total = conn.execute(
+            "SELECT COUNT(*) AS c FROM files WHERE status != 'deleted'"
+        ).fetchone()["c"]
         discovered = conn.execute(
             "SELECT COUNT(*) AS c FROM files WHERE status = 'discovered'"
         ).fetchone()["c"]
@@ -412,10 +460,12 @@ def count_files() -> dict[str, int]:
             "SELECT COUNT(*) AS c FROM files WHERE status = 'deleted'"
         ).fetchone()["c"]
         chunks = conn.execute("SELECT COUNT(*) AS c FROM chunks").fetchone()["c"]
+    ready = int(discovered) + int(pending)
     return {
         "total": int(total),
         "discovered": int(discovered),
         "pending": int(pending),
+        "ready": int(ready),
         "indexed": int(indexed),
         "failed": int(failed),
         "deleted": int(deleted),

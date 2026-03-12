@@ -7,214 +7,204 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <main class="app-shell">
-      <header class="masthead">
-        <div class="brand-block">
-          <p class="brand-kicker">Relevect</p>
-          <h1>Private context with product-grade clarity.</h1>
-          <p class="brand-copy">
-            Trust a folder. Scan for changes. Run indexing. Search with provenance. The engine stays
-            local, but the experience should feel calm enough for non-technical people.
-          </p>
+    <!-- Premium Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+        </svg>
+        <span class="brand-name">Relevect</span>
+        <span class="badge badge-neutral">Local Context Engine</span>
+      </div>
+      
+      <!-- Sleek Horizontal Workflow Strip -->
+      <nav class="workflow-timeline">
+        <div class="timeline-step">
+          <span class="step-num">01</span>
+          <span class="step-text">Trust Folders</span>
         </div>
-        <div class="masthead-meta">
-          <span id="engine-status" class="signal signal-muted">Engine unknown</span>
-          <span class="signal">On-device</span>
-          <span class="signal">Mac desktop</span>
+        <div class="timeline-divider"></div>
+        <div class="timeline-step">
+          <span class="step-num">02</span>
+          <span class="step-text">Scan Changes</span>
         </div>
-      </header>
+        <div class="timeline-divider"></div>
+        <div class="timeline-step">
+          <span class="step-num">03</span>
+          <span class="step-text">Index & Embed</span>
+        </div>
+        <div class="timeline-divider"></div>
+        <div class="timeline-step">
+          <span class="step-num">04</span>
+          <span class="step-text">Search</span>
+        </div>
+      </nav>
 
+      <div class="header-right">
+        <div class="engine-indicator">
+          <span id="engine-status" class="signal signal-muted">Engine unknown</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="app-shell">
       <nav class="tabs" aria-label="Views">
-        <button class="tab-button is-active" data-tab="home">Home</button>
-        <button class="tab-button" data-tab="advanced">Advanced</button>
+        <button class="tab-button is-active" data-tab="home">Workspace</button>
+        <button class="tab-button" data-tab="insights">Insights & Activity</button>
+        <button class="tab-button" data-tab="advanced">Developer</button>
       </nav>
 
       <section id="tab-home" class="tab-panel is-active">
+        
+        <!-- Dynamic Command Deck -->
         <section class="command-deck">
-          <article class="command-card command-card-primary">
-            <p class="section-kicker">Trust boundary</p>
-            <h2>Add a trusted folder</h2>
-            <p>
-              Relevect never guesses what to crawl. The product starts when you explicitly choose a
-              folder that should be searchable.
-            </p>
-            <div class="path-row">
-              <input id="folder-path" type="text" placeholder="/Users/you/Documents/PrivateDocs" />
-              <button id="register-folder">Add Folder</button>
+          <article class="command-surface primary-surface">
+            <div class="surface-header">
+              <span class="surface-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+              </span>
+              <h2>Trust Boundary</h2>
             </div>
-          </article>
-
-          <article class="command-card">
-            <p class="section-kicker">Pipeline</p>
-            <h2>Keep the index current</h2>
-            <p>Run the workflow in order. Scan discovers changes. Indexing processes anything new, changed, or stale.</p>
-            <div class="command-actions">
-              <button id="scan-folders">Scan for Changes</button>
-              <button id="run-indexing">Run Indexing</button>
-              <button id="refresh-all" class="secondary">Refresh</button>
+            <p>Choose a folder in Finder and Relevect will trust it locally. Nothing is uploaded anywhere.</p>
+            <input id="folder-picker" type="file" webkitdirectory directory multiple hidden />
+            <div class="path-row custom-input-group">
+              <input id="folder-path" type="text" placeholder="Chosen folder will appear here" readonly />
+              <button id="pick-folder" class="btn-primary">Upload Folder</button>
             </div>
-          </article>
-
-          <article class="command-card command-card-proof">
-            <p class="section-kicker">Trust</p>
-            <h2>Nothing leaves the machine unless you make it.</h2>
-            <p>
-              Local model, local metadata, local retrieval. The interface should make that obvious,
-              not assume users will read documentation.
-            </p>
+            <p id="home-feedback" class="home-feedback home-feedback-intro">Choose a folder to start building your private index.</p>
           </article>
         </section>
 
-        <section class="workflow-strip">
-          <div class="workflow-step">
-            <span class="workflow-index">01</span>
-            <div>
-              <strong>Folders</strong>
-              <p>Choose what Relevect can see.</p>
-            </div>
-          </div>
-          <div class="workflow-step">
-            <span class="workflow-index">02</span>
-            <div>
-              <strong>Scan</strong>
-              <p>Discover new, changed, and deleted files.</p>
-            </div>
-          </div>
-          <div class="workflow-step">
-            <span class="workflow-index">03</span>
-            <div>
-              <strong>Index</strong>
-              <p>Parse, chunk, embed, and persist.</p>
-            </div>
-          </div>
-          <div class="workflow-step">
-            <span class="workflow-index">04</span>
-            <div>
-              <strong>Search</strong>
-              <p>Return grounded passages with source signals.</p>
-            </div>
-          </div>
-        </section>
-
+        <!-- Elevated Workspace 2 Columns (Sources & Search) -->
         <section class="workspace">
-          <aside class="sources-panel">
-            <div class="panel-header">
-              <div>
-                <p class="section-kicker">Sources</p>
-                <h2>Trusted folders</h2>
-              </div>
-              <button id="refresh-folders" class="secondary">Refresh</button>
+          
+          <!-- Sources Sidebar Column -->
+          <aside class="workspace-col col-sources">
+            <div class="col-header">
+              <h3>Sources</h3>
+              <button id="refresh-folders" class="btn-icon" title="Refresh Folders">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h5"/></svg>
+              </button>
             </div>
-            <div id="folder-list" class="folder-list empty-state">
-              Add a trusted folder to begin.
+            <div class="col-content">
+              <div id="folder-list" class="folder-list empty-state">
+                Add a trusted folder to begin.
+              </div>
             </div>
           </aside>
 
-          <section class="search-panel">
+          <!-- Search Main Column -->
+          <section class="workspace-col col-search">
             <div class="search-hero">
-              <div>
-                <p class="section-kicker">Search</p>
-                <h2>Ask your private corpus something specific.</h2>
-                <p id="search-summary" class="search-summary">
-                  Results will surface the strongest passages from indexed files, with provenance.
-                </p>
+              <h1 class="hero-title">Ask your corpus.</h1>
+              <p id="search-summary" class="hero-subtitle">Results surface strongest passages with provenance.</p>
+            </div>
+            
+            <div class="omnibox-wrapper">
+              <div class="omnibox">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21L16.65 16.65"/></svg>
+                <input id="search-query" type="text" placeholder="Search for concepts, facts, or code..." />
+                <button id="run-search" class="btn-primary btn-sm">Enter ↵</button>
               </div>
-              <span class="signal signal-quiet">Hybrid ranking</span>
             </div>
 
-            <div class="search-bar">
-              <input id="search-query" type="text" placeholder="hard hearted" />
-              <button id="run-search">Search</button>
-            </div>
-
-            <div id="search-results" class="search-results empty-state">
-              Search results will appear here with source snippets and scores.
+            <div class="col-content search-content">
+              <div id="search-results" class="search-results empty-state">
+                Search results will appear here. No data sent to the cloud.
+              </div>
             </div>
           </section>
 
-          <aside class="insight-panel">
-            <section class="info-panel">
-              <div class="panel-header">
-                <div>
-                  <p class="section-kicker">Selection</p>
-                  <h2>Inspector</h2>
-                </div>
-                <button id="refresh-files" class="secondary">Refresh Files</button>
-              </div>
-              <div id="inspector" class="inspector empty-state">
-                Select a folder or file to inspect what Relevect knows about it.
-              </div>
-            </section>
-
-            <section class="info-panel">
-              <div class="panel-header">
-                <div>
-                  <p class="section-kicker">Health</p>
-                  <h2>Index state</h2>
-                </div>
-                <button id="refresh-status" class="secondary">Refresh Status</button>
-              </div>
-              <div id="status-cards" class="status-cards"></div>
-            </section>
-
-            <section class="info-panel">
-              <div class="panel-header">
-                <div>
-                  <p class="section-kicker">Library</p>
-                  <h2>Files</h2>
-                  <p id="library-subtitle" class="panel-copy">Files inside the selected trusted folder.</p>
-                </div>
-              </div>
-              <div id="file-list" class="file-list empty-state">
-                Scan a folder to see discovered and indexed files.
-              </div>
-            </section>
-
-            <section class="info-panel">
-              <div class="panel-header">
-                <div>
-                  <p class="section-kicker">Activity</p>
-                  <h2>Recent jobs</h2>
-                </div>
-              </div>
-              <div id="jobs-list" class="jobs-list empty-state">
-                No jobs yet.
-              </div>
-            </section>
-          </aside>
         </section>
+      </section>
+
+      <!-- NEW INSIGHTS TAB -->
+      <section id="tab-insights" class="tab-panel">
+         <div class="insights-shell">
+           <aside class="insights-sidebar">
+             <div class="insights-sidebar-header">
+               <div>
+                 <h3>Sources</h3>
+                 <p>Choose a trusted folder to inspect its library and activity.</p>
+               </div>
+               <button id="refresh-folders-insights" class="ghost-link">Refresh</button>
+             </div>
+             <div id="folder-list-insights" class="folder-list empty-state">
+               Add a trusted folder to begin.
+             </div>
+           </aside>
+
+           <section class="insights-main">
+             <div class="insights-top-row">
+               <div class="insight-card">
+                 <div class="insight-header">
+                   <h4>Index Health</h4>
+                   <button id="refresh-status" class="ghost-link">Update</button>
+                 </div>
+                 <div id="status-cards" class="status-grid"></div>
+               </div>
+             </div>
+
+             <div class="insights-bottom-row">
+               <div class="insight-card insight-card-library">
+                 <div class="insight-header insight-header-stack">
+                   <div>
+                     <h4>Library</h4>
+                     <p id="library-subtitle" class="micro-text library-subtitle">Folder files</p>
+                   </div>
+                   <button id="refresh-files" class="ghost-link">Refresh Library</button>
+                 </div>
+                 <div class="insight-content-scrollable insight-content-tall">
+                   <div id="file-list" class="file-list empty-state mini">
+                     No files discovered.
+                   </div>
+                 </div>
+               </div>
+
+               <div class="insight-card insight-card-jobs">
+                 <div class="insight-header">
+                   <h4>Recent Jobs</h4>
+                 </div>
+                 <div class="insight-content-scrollable short">
+                   <div id="jobs-list" class="jobs-list empty-state mini">
+                     No jobs yet.
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </section>
+         </div>
       </section>
 
       <section id="tab-advanced" class="tab-panel">
         <section class="advanced-shell">
+          <section class="advanced-reset-banner">
+            <div class="advanced-reset-copy">
+              <p class="advanced-reset-kicker">Local Maintenance</p>
+              <h2 class="advanced-reset-title">Reset Relevect Data</h2>
+              <p class="advanced-copy">Clear Relevect's local folders, files, chunks, and index jobs without deleting anything on disk.</p>
+            </div>
+            <button id="reset-local-data" class="btn-secondary advanced-reset-button">Reset Local Data</button>
+          </section>
           <div class="advanced-intro">
-            <p class="section-kicker">Advanced mode</p>
-            <h2>Raw engine state for debugging and development.</h2>
-            <p>Home stays product-focused. This tab keeps the JSON and low-level internals out of the main experience.</p>
+            <h2 class="serif-head">Raw System State</h2>
+            <p>Internal JSON structures for debugging routing, parser output, and search scores.</p>
           </div>
           <section class="advanced-grid">
             <div class="advanced-card">
-              <div class="panel-header">
-                <h2>Folders JSON</h2>
-              </div>
+              <h3 class="card-title">Folders JSON</h3>
               <pre id="folders-output" class="output"></pre>
             </div>
             <div class="advanced-card">
-              <div class="panel-header">
-                <h2>Files JSON</h2>
-              </div>
+              <h3 class="card-title">Files JSON</h3>
               <pre id="files-output" class="output"></pre>
             </div>
             <div class="advanced-card">
-              <div class="panel-header">
-                <h2>Jobs JSON</h2>
-              </div>
+              <h3 class="card-title">Jobs JSON</h3>
               <pre id="jobs-output" class="output"></pre>
             </div>
             <div class="advanced-card">
-              <div class="panel-header">
-                <h2>Search JSON</h2>
-              </div>
+              <h3 class="card-title">Search Response JSON</h3>
               <pre id="search-output" class="output search-output"></pre>
             </div>
           </section>
@@ -222,6 +212,55 @@
       </section>
     </main>
 
+    <div id="index-review-modal" class="modal-backdrop" hidden>
+      <section class="modal-shell" role="dialog" aria-modal="true" aria-labelledby="index-review-title">
+        <div class="modal-header">
+          <div>
+            <p class="modal-kicker">Workspace Review</p>
+            <h2 id="index-review-title">Choose Files To Index</h2>
+            <p id="index-review-subtitle" class="modal-subtitle">Review the scanned files before they enter your private index.</p>
+          </div>
+          <button id="close-index-review" class="btn-icon modal-close" title="Close review">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <div class="modal-actions">
+          <span id="index-review-count" class="modal-count">0 files selected</span>
+          <div class="modal-action-group">
+            <button id="select-all-review" class="ghost-link">Select All</button>
+            <button id="clear-all-review" class="ghost-link">Clear</button>
+          </div>
+        </div>
+
+        <div id="index-review-list" class="modal-list empty-state">
+          No files are waiting for indexing.
+        </div>
+
+        <div class="modal-footer">
+          <button id="cancel-index-review" class="btn-secondary">Not Now</button>
+          <button id="submit-index-review" class="btn-primary">Index Selected Files</button>
+        </div>
+      </section>
+    </div>
+
+    <div id="confirm-modal" class="modal-backdrop" hidden>
+      <section class="modal-shell modal-shell-compact" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+        <div class="modal-header">
+          <div>
+            <p class="modal-kicker">Confirm Action</p>
+            <h2 id="confirm-title">Remove From Relevect</h2>
+            <p id="confirm-message" class="modal-subtitle">This removes metadata from Relevect only.</p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="confirm-cancel" class="btn-secondary">Cancel</button>
+          <button id="confirm-submit" class="btn-primary">Confirm Remove</button>
+        </div>
+      </section>
+    </div>
+
     <script type="module" src="./main.js"></script>
   </body>
-  </html>
+</html>
